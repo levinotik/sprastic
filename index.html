@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Sprastic by levinotik</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Sprastic</h1>
+        <p>lightweight elasticsearch client built on Akka and Spray</p>
+
+        <p class="view"><a href="https://github.com/levinotik/sprastic">View the Project on GitHub <small>levinotik/sprastic</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/levinotik/sprastic/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/levinotik/sprastic/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/levinotik/sprastic">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="sprastic---lightweight-elasticsearch-client-built-on-akka-and-spray" class="anchor" href="#sprastic---lightweight-elasticsearch-client-built-on-akka-and-spray"><span class="octicon octicon-link"></span></a>Sprastic - lightweight elasticsearch client built on Akka and Spray</h1>
+
+<h2>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h2>
+
+<p><code>val client = SprasticClient(context)</code></p>
+
+<p>by default this will use the host and port specified in your config in "sprastic", e.g.</p>
+
+<pre><code>    sprastic {
+        host = "localhost"
+        port = 9200
+    }
+</code></pre>
+
+<p>If you need to use a different config or have several, you can simply create a new Config and use that. For example:</p>
+
+<pre><code>    sprastic-production {
+        host = "production-host"
+        port = production-port
+    }
+</code></pre>
+
+<p><code>val client = SprasticClient(context, ConfigFactory.load().getConfig("sprastic-production"))</code></p>
+
+<pre><code>    sprastic-stage {
+        host = "stage-host"
+        port = stage-port
+    }
+</code></pre>
+
+<p><code>val client = SprasticClient(context, ConfigFactory.load().getConfig("stage-production"))</code></p>
+
+<p>In Sprastic, all you do is send messages (Add, Get, Delete, MultiGet, etc) to the client and get back HttpResponses. That's it.</p>
+
+<h2>
+<a name="add" class="anchor" href="#add"><span class="octicon octicon-link"></span></a>Add</h2>
+
+<p>To add a document with an id:</p>
+
+<p><code>client ! Add("twitter", "tweet", s"""{"text": "chirp"}""", Some("1"))</code></p>
+
+<p>To add without an id (relying on elasticsearch to auto-generate one):</p>
+
+<p><code>client ! Add("twitter", "tweet", s"""{"text": "chirp"}""")</code></p>
+
+<p>in both cases, you'll get back a spray.http.HttpResponse:</p>
+
+<p><code>case response: HttpResponse =&gt; println(response)</code></p>
+
+<pre><code>    HttpResponse(200 OK,HttpEntity(application/json; charset=UTF-8,{"_index":"twitter","_type":"tweet","_id":"1","_version":2,"created":false}),List(Content-Length: 75, Content-Type: application/json; charset=UTF-8),HTTP/1.1)
+</code></pre>
+
+<h2>
+<a name="get" class="anchor" href="#get"><span class="octicon octicon-link"></span></a>Get</h2>
+
+<div class="highlight highlight-scala"><pre>      <span class="k">val</span> <span class="n">client</span> <span class="k">=</span> <span class="nc">SprasticClient</span><span class="o">(</span><span class="n">context</span><span class="o">)</span>
+      <span class="n">client</span> <span class="o">!</span> <span class="nc">Get</span><span class="o">(</span><span class="s">"twitter"</span><span class="o">,</span> <span class="s">"tweet"</span><span class="o">,</span> <span class="s">"1"</span><span class="o">)</span>
+      <span class="c1">//... in your Receive function</span>
+    <span class="k">case</span> <span class="n">response</span><span class="k">:</span> <span class="kt">HttpResponse</span> <span class="o">=&gt;</span>
+      <span class="n">println</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="n">entity</span><span class="o">.</span><span class="n">asString</span><span class="o">)</span>
+  <span class="o">}</span>
+</pre></div>
+
+<pre><code>    {"_index":"twitter","_type":"tweet","_id":"1","_version":2,"found":true, "_source" : {"text": "chirp"} }
+</code></pre>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/levinotik">levinotik</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
