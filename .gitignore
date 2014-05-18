@@ -1,0 +1,23 @@
+target/
+/.lib/
+
+*~
+/.ensime
+
+*.cache
+*.classpath
+*.project
+*.settings/
+*.scalastyle
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
