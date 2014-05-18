@@ -10,14 +10,14 @@ import akka.util.Timeout
 import scala.concurrent.duration.FiniteDuration
 
 class SprasticClient(config: Config = ConfigFactory.load().getConfig("sprastic")) {
-  import SprasticClient._
   import akka.pattern.ask
+  val system: ActorSystem = ActorSystem("sprastic-actor-system")
   def execute(operation: ESOperation)(implicit timeout: FiniteDuration): Future[HttpResponse] =
     system.actorOf(ElasticSearchActor.props(config)).ask(operation)(Timeout(timeout)).mapTo[HttpResponse]
+  def shutdown() = system.shutdown()
 }
 
 object SprasticClient {
-  private lazy val system: ActorSystem = ActorSystem("sprastic-actor-system")
 
   def apply(actorRefFactory: ActorRefFactory): ActorRef =
     actorRefFactory.actorOf(ElasticSearchActor.props(ConfigFactory.load().getConfig("sprastic")))
@@ -27,7 +27,5 @@ object SprasticClient {
 
   def apply(config: Config): SprasticClient =  new SprasticClient(config)
 
-  def apply(): SprasticClient =  new SprasticClient
-
-
+  def apply(): SprasticClient = new SprasticClient
 }

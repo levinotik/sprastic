@@ -2,16 +2,22 @@
 
 ##Getting started
 
-A client can be used inside or outside of the context of an ActorSystem. 
+There are two ways to use the client. 
 
-**Within your ActorSystem** (if you're using Akka in your project, you'll want to use this) :
+1. As a plain old ActorRef
+2. As an instance of a SprasticClient
+
+**As an ActorRef** (if you're using Akka in your project, you'll want to use this) :
 
 ```scala
 val client = SprasticClient(context) // <-- this is just an ActorRef 
 client ! Get("twitter", "tweet", "1")
 ```
 
-**Outside of an ActorSystem** (if you're not using Akka in your project, you'll have to use this):
+If you're using the ActorRef way, the "client" can be created millions of times if need be since it's simply creating a new Actor.
+
+
+**As a SprasticClient** (if you're not using Akka in your project, you'll have to use this):
 
 ```scala
 val client = SprasticClient() // <-- instance of a SprasticClient
@@ -26,6 +32,8 @@ client.execute(Get("twitter", "tweet", "1")) onComplete {
 }
 
 ```
+
+If you're using the non-ActorRef variant, you'll need to create a single instance and pass it around since, internally, it creates an ActorSystem (which is expensive). You should also probably call `shutdown()` on the client when you're done with it.
 
 by default this will use the host and port specified in your config in "sprastic", e.g.
 
@@ -49,7 +57,7 @@ If you need to use a different config or have several, you can simply create a n
  			port = stage-port
 		}
 		
-`val client = SprasticClient(context, ConfigFactory.load().getConfig("stage-production"))`
+`val client = SprasticClient(context, ConfigFactory.load().getConfig("sprastic-stage"))`
 
 **The following examples assume you're using Sprastic within your own ActorSystem. If you're not, refer to the above example which demonstrates usage outside of an ActorSystem.**
 
@@ -82,10 +90,3 @@ in both cases, you'll get back a spray.http.HttpResponse:
       //prints: {"_index":"twitter","_type":"tweet","_id":"1","_version":2,"found":true, "_source" : {"text": "chirp"} }
   }
 ```
-
-
-
-
-
-
-

@@ -1,7 +1,7 @@
 package com.notik.sprastic
 
 import akka.actor.{Actor, ActorSystem}
-import com.notik.sprastic.api.Get
+import com.notik.sprastic.api.{Add, Get}
 import com.notik.sprastic.client.SprasticClient
 import spray.http.HttpResponse
 import scala.util.{Failure, Success}
@@ -13,8 +13,9 @@ object SprasticApp extends App {
   import scala.concurrent.duration._
   implicit val timeout:FiniteDuration = 10.seconds
 
-  SprasticClient().execute(Get("twitter", "tweet", "1")) onComplete {
-    case Success(response) => println(response)
+  val client = SprasticClient()
+  client.execute(Add("twitter", "tweet", """{"foo":"bar"}""")) onComplete {
+    case Success(response) => println("got response! " + response)
     case Failure(failure) => println(failure)
   }
 }
