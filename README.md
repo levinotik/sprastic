@@ -2,7 +2,30 @@
 
 ##Getting started
 
-`val client = SprasticClient(context)`
+A client can be used inside or outside of the context of an ActorSystem. 
+
+**Within your ActorSystem** (if you're using Akka in your project, you'll want to use this) :
+
+```scala
+val client = SprasticClient(context) // <-- this is just an ActorRef 
+client ! Get("twitter", "tweet", "1")
+```
+
+**Outside of an ActorSystem** (if you're not using Akka in your project, you'll have to use this):
+
+```scala
+val client = SprasticClient() // <-- instance of a SprasticClient
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+implicit val timeout:FiniteDuration = 10.seconds
+
+client.execute(Get("twitter", "tweet", "1")) onComplete {
+  case Success(response) => println(response)
+  case Failure(failure) => println(failure)
+}
+
+```
 
 by default this will use the host and port specified in your config in "sprastic", e.g.
 
@@ -28,7 +51,8 @@ If you need to use a different config or have several, you can simply create a n
 		
 `val client = SprasticClient(context, ConfigFactory.load().getConfig("stage-production"))`
 
-In Sprastic, all you do is send messages (Add, Get, Delete, MultiGet, etc) to the client and get back HttpResponses. That's it.
+**The following examples assume you're using Sprastic within your own ActorSystem. If you're not, refer to the above example which demonstrates usage outside of an ActorSystem.**
+
 
 ##Add
 
@@ -55,10 +79,11 @@ in both cases, you'll get back a spray.http.HttpResponse:
       //... in your Receive function
     case response: HttpResponse =>
       println(response.entity.asString)
+      //prints: {"_index":"twitter","_type":"tweet","_id":"1","_version":2,"found":true, "_source" : {"text": "chirp"} }
   }
 ```
 
-		{"_index":"twitter","_type":"tweet","_id":"1","_version":2,"found":true, "_source" : {"text": "chirp"} }
+
 
 
 

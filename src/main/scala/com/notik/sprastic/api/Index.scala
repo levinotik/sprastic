@@ -16,10 +16,10 @@ case class Add(index: String,
                `type`: String,
                  document: String,
                  id: Option[String] = None
-                ) extends Index
+                ) extends Index with ESOperation
 
 case class Update(index: String,
                   `type`: String,
                   document: String,
                   id: String,
-                  version: Option[Int] = None) extends Index
+                  version: Option[Int] = None) extends Index with ESOperation
