@@ -34,15 +34,20 @@
 <h2>
 <a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h2>
 
-<p>A client can be used inside or outside of the context of an ActorSystem. </p>
+<p>There are two ways to use the client. </p>
 
-<p><strong>Within your ActorSystem</strong> (if you're using Akka in your project, you'll want to use this) :</p>
+<ol>
+<li>As a plain old ActorRef</li>
+<li>As an instance of a SprasticClient</li>
+</ol><p><strong>As an ActorRef</strong> (if you're using Akka in your project, you'll want to use this) :</p>
 
 <div class="highlight highlight-scala"><pre><span class="k">val</span> <span class="n">client</span> <span class="k">=</span> <span class="nc">SprasticClient</span><span class="o">(</span><span class="n">context</span><span class="o">)</span> <span class="c1">// &lt;-- this is just an ActorRef </span>
 <span class="n">client</span> <span class="o">!</span> <span class="nc">Get</span><span class="o">(</span><span class="s">"twitter"</span><span class="o">,</span> <span class="s">"tweet"</span><span class="o">,</span> <span class="s">"1"</span><span class="o">)</span>
 </pre></div>
 
-<p><strong>Outside of an ActorSystem</strong> (if you're not using Akka in your project, you'll have to use this):</p>
+<p>If you're using the ActorRef way, the "client" can be created millions of times if need be since it's simply creating a new Actor.</p>
+
+<p><strong>As a SprasticClient</strong> (if you're not using Akka in your project, you'll have to use this):</p>
 
 <div class="highlight highlight-scala"><pre><span class="k">val</span> <span class="n">client</span> <span class="k">=</span> <span class="nc">SprasticClient</span><span class="o">()</span> <span class="c1">// &lt;-- instance of a SprasticClient</span>
 
@@ -56,6 +61,8 @@
 <span class="o">}</span>
 
 </pre></div>
+
+<p>If you're using the non-ActorRef variant, you'll need to create a single instance and pass it around since, internally, it creates an ActorSystem (which is expensive). You should also probably call <code>shutdown()</code> on the client when you're done with it.</p>
 
 <p>by default this will use the host and port specified in your config in "sprastic", e.g.</p>
 
