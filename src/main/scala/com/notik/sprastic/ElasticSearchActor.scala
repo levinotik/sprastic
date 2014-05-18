@@ -41,31 +41,31 @@ private[this] class Worker(io: ActorRef, target: ActorRef, host: String, port: I
   implicit val formats = Serialization.formats(NoTypeHints)
 
   override def receive: Actor.Receive = {
-    case index: Index =>
-      index match {
-        case Add(index, table, data, id) =>
+    case i: Index =>
+      i match {
+        case Add(index, t, data, id) =>
           val request = HttpRequest(method = id.fold(HttpMethods.POST)(_ => HttpMethods.PUT),
-            uri = Uri(s"http://$host:$port/$index/$table/${id.getOrElse("")}"),
+            uri = Uri(s"http://$host:$port/$index/$t/${id.getOrElse("")}"),
             entity = HttpEntity(data))
           sendTo(io).withResponsesReceivedBy(self)(request)
           become(responseReceive)
-        case Update(index, table, data, id, version) =>
+        case Update(index, t, data, id, version) =>
           val request = HttpRequest(method =  HttpMethods.PUT,
-            uri = Uri(s"http://$host:$port/$index/$table/$id${version.fold("")(v => s"?version=$v")}"),
+            uri = Uri(s"http://$host:$port/$index/$t/$id${version.fold("")(v => s"?version=$v")}"),
             entity = HttpEntity(data))
           sendTo(io).withResponsesReceivedBy(self)(request)
           become(responseReceive)
       }
 
-    case Get(index, table, id) =>
+    case Get(index, t, id) =>
       val request = HttpRequest(method =  HttpMethods.GET,
-        uri = Uri(s"http://$host:$port/$index/$table/$id"))
+        uri = Uri(s"http://$host:$port/$index/$t/$id"))
       sendTo(io).withResponsesReceivedBy(self)(request)
       become(responseReceive)
 
-    case Delete(index, table, id) =>
+    case Delete(index, t, id) =>
       val request = HttpRequest(method =  HttpMethods.DELETE,
-        uri = Uri(s"http://$host:$port/$index/$table/$id"))
+        uri = Uri(s"http://$host:$port/$index/$t/$id"))
       sendTo(io).withResponsesReceivedBy(self)(request)
       become(responseReceive)
 
