@@ -8,8 +8,9 @@ import scala.concurrent.Future
 import spray.http.HttpResponse
 import akka.util.Timeout
 import scala.concurrent.duration.FiniteDuration
+import com.notik.sprastic.config.SprasticConfig
 
-class SprasticClient(config: Config = ConfigFactory.load().getConfig("sprastic")) {
+class SprasticClient(config: Config = SprasticConfig.defaultConfig) {
   import akka.pattern.ask
   val system: ActorSystem = ActorSystem("sprastic-actor-system")
   def execute(operation: ESOperation)(implicit timeout: FiniteDuration): Future[HttpResponse] =
@@ -20,7 +21,7 @@ class SprasticClient(config: Config = ConfigFactory.load().getConfig("sprastic")
 object SprasticClient {
 
   def apply(actorRefFactory: ActorRefFactory): ActorRef =
-    actorRefFactory.actorOf(ElasticSearchActor.props(ConfigFactory.load().getConfig("sprastic")))
+    actorRefFactory.actorOf(ElasticSearchActor.props())
 
   def apply(actorRefFactory: ActorRefFactory, config: Config): ActorRef =
     actorRefFactory.actorOf(ElasticSearchActor.props(config))
